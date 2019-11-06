@@ -7,7 +7,7 @@ import os
 if _platform == 'linux' or _platform == 'linux2':
     drv_eng = 'web_driver/linux/chromedriver'
 elif _platform == 'win32':
-    drv_eng = 'web_driver/windows/chromedriver'
+    drv_eng = 'web_driver/windows/chromedriver.exe'
 elif _platform == 'darwin':
     drv_eng = 'web_driver/osx/chromedriver'
 
@@ -37,6 +37,11 @@ class LinkCollector(metaclass=abc.ABCMeta):
         if not self.__next_page:
             return
 
+        def routine_job():
+            self.__load_page(self.__next_page)
+            self.__links.extend(self.get_links_the_page())
+            self.__next_page = self.get_next_page()
+
         while True:
             reply = input('Found next page, continue? [Yes/No/Auto]')
             if reply[0].lower() not in ['y', 'n', 'a']:
@@ -45,17 +50,15 @@ class LinkCollector(metaclass=abc.ABCMeta):
             if reply[0].lower() == 'a':
                 while True:
                     try:
-                        self.__load_page(self.__next_page)
-                        self.__links.extend(self.get_links_the_page())
-                        self.__next_page = self.get_next_page()
+                        routine_job()
                         if not self.__next_page:
                             return
                     except KeyboardInterrupt:
                         return
             elif reply[0].lower() == 'y':
-                self.__load_page(self.__next_page)
-                self.__links.extend(self.get_links_the_page())
-                self.__next_page = self.get_next_page()
+                routine_job()
+                if not self.__next_page:
+                    return
                 continue
             else:
                 return
