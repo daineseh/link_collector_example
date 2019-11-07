@@ -63,13 +63,16 @@ class LinkCollector(metaclass=abc.ABCMeta):
             else:
                 return
 
-    def process(self):
-        self.__links.extend(self.get_links_the_page())
-        self.__process_next_page()
+    def close(self):
+        self.driver.quit()
 
     def dump(self):
         for idx, link in enumerate(self.__links, start=1):
             print(f'{idx}. {link}')
+
+    def process(self):
+        self.__links.extend(self.get_links_the_page())
+        self.__process_next_page()
 
     @abc.abstractmethod
     def get_links_the_page(self):
