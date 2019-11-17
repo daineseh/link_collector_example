@@ -43,8 +43,8 @@ class LinkCollector(metaclass=abc.ABCMeta):
             self.__next_page = self.get_next_page()
 
         while True:
-            reply = input('Found next page, continue? [Yes/No/Auto]')
-            if reply[0].lower() not in ['y', 'n', 'a']:
+            reply = input('Found next page, continue? Number that for repeat times [Yes/No/Auto/Number]')
+            if reply[0].lower() not in ['y', 'n', 'a'] and not reply.isdigit():
                 continue
 
             if reply[0].lower() == 'a':
@@ -60,6 +60,13 @@ class LinkCollector(metaclass=abc.ABCMeta):
                 if not self.__next_page:
                     return
                 continue
+            elif reply.isdigit():
+                cnt = int(reply)
+                while cnt:
+                    routine_job()
+                    if not self.__next_page:
+                        return
+                    cnt -= 1
             else:
                 return
 
